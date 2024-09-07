@@ -1,0 +1,206 @@
+<!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Priority Scheduling</title>
+<link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+<h2>Priority Scheduling </h2>
+<h6>Lesser the number higher the priority</h6>
+<div>
+    <label for="processes">Number of Processes:</label>
+    <input type="number" id="processes" min="1" value="1">
+    <button onclick="generateForm()">Generate Form</button>
+</div>
+<div id="formContainer"></div>
+<button onclick="schedulePriority()">Schedule Priority</button>
+<div id="output"></div>
+<div class="container">
+    <a href="home.html" class="btn">HOME</a>
+</div>
+
+<script>
+    // JavaScript code
+    function generateForm() {
+        var processes = parseInt(document.getElementById("processes").value);
+        var formHTML = '';
+        for (var i = 0; i < processes; i++) {
+            formHTML += '<div>';
+            formHTML += '<label for="arrivalTime' + i + '">Arrival Time for Process ' + (i + 1) + ':</label>';
+            formHTML += '<input type="number" id="arrivalTime' + i + '" min="0" value="0">';
+            formHTML += '<label for="burstTime' + i + '">Burst Time for Process ' + (i + 1) + ':</label>';
+            formHTML += '<input type="number" id="burstTime' + i + '" min="1" value="1">';
+            formHTML += '<label for="priority' + i + '">Priority for Process ' + (i + 1) + ':</label>';
+            formHTML += '<input type="number" id="priority' + i + '" min="1" value="1">';
+            formHTML += '</div>';
+        }
+        document.getElementById("formContainer").innerHTML = formHTML;
+    }
+
+    function schedulePriority() {
+    var processes = parseInt(document.getElementById("processes").value);
+    var processList = [];
+    for (var i = 0; i < processes; i++) {
+        var arrivalTime = parseInt(document.getElementById("arrivalTime" + i).value);
+        var burstTime = parseInt(document.getElementById("burstTime" + i).value);
+        var priority = parseInt(document.getElementById("priority" + i).value);
+        processList.push({ p_no: i + 1, AT: arrivalTime, BT: burstTime, priority: priority });
+    }
+
+    processList.sort((a, b) => a.AT - b.AT);
+
+    var completionTime = 0; // Initialize completion time
+    var waitingTimeTotal = 0;
+    var turnaroundTimeTotal = 0;
+
+    var outputHTML = '<h3>Table</h3><table>';
+    outputHTML += '<tr><th>Process</th><th>Arrival Time</th><th>Burst Time</th><th>Priority</th><th>Completion Time</th><th>Waiting Time</th><th>Turnaround Time</th></tr>';
+
+    processList.forEach(process => {
+        completionTime = Math.max(completionTime, process.AT) + process.BT; // Update completion time
+        var waitingTime = Math.max(0, completionTime - process.AT - process.BT);
+        var turnaroundTime = waitingTime + process.BT;
+        waitingTimeTotal += waitingTime;
+        turnaroundTimeTotal += turnaroundTime;
+        outputHTML += '<tr>';
+        outputHTML += '<td>P' + process.p_no + '</td>';
+        outputHTML += '<td>' + process.AT + '</td>';
+        outputHTML += '<td>' + process.BT + '</td>';
+        outputHTML += '<td>' + process.priority + '</td>';
+        outputHTML += '<td>' + completionTime + '</td>';
+        outputHTML += '<td>' + waitingTime + '</td>';
+        outputHTML += '<td>' + turnaroundTime + '</td>';
+        outputHTML += '</tr>';
+    });
+
+    outputHTML += '</table>';
+    outputHTML += '<p>Average Waiting Time: ' + (waitingTimeTotal / processes).toFixed(2) + '</p>';
+    outputHTML += '<p>Average Turnaround Time: ' + (turnaroundTimeTotal / processes).toFixed(2) + '</p>';
+
+    document.getElementById("output").innerHTML = outputHTML;
+}
+
+</script>
+
+</body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priority Scheduler</title>
+  <link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+  <h2>Priority Scheduler</h2>
+  <form id="process-form">
+    <label for="process-count">Number of Processes:</label>
+    <input type="number" id="process-count" name="process-count" required>
+    <button type="submit">Generate Form</button>
+  </form>
+
+  <div id="process-input"> </div>
+
+  <button id="run-scheduler" >Schedule Priority</button>
+
+  <div id="output"></div>
+  <div class="container">
+    <a href="home.html" class="btn">HOME</a>
+  </div>
+
+  <script>
+    document.getElementById('process-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var processCount = parseInt(document.getElementById('process-count').value);
+      var processInputDiv = document.getElementById('process-input');
+      processInputDiv.innerHTML = '';
+
+      for (var i = 0; i < processCount; i++) {
+        var div = document.createElement('div');
+        div.innerHTML = `
+          <h3>Process ${i + 1}</h3>
+          <label for="pid${i}">Process ID:</label>
+          <input type="text" id="pid${i}" name="pid${i}" required>
+          <label for="arr-time${i}">Arrival Time:</label>
+          <input type="number" id="arr-time${i}" name="arr-time${i}" required>
+          <label for="burst-time${i}">Burst Time:</label>
+          <input type="number" id="burst-time${i}" name="burst-time${i}" required>
+          <label for="priority${i}">Priority:</label>
+          <input type="number" id="priority${i}" name="priority${i}" required>
+        `;
+        processInputDiv.appendChild(div);
+      }
+
+      document.getElementById('process-input').style.display = 'block';
+      document.getElementById('run-scheduler').style.display = 'block';
+    });
+
+    function priorityScheduler() {
+      var processes = [];
+      var totalTurnaroundTime = 0;
+      var totalWaitingTime = 0;
+
+      for (var i = 0; i < document.getElementById('process-count').value; i++) {
+        var pid = document.getElementById('pid' + i).value;
+        var arrivalTime = parseInt(document.getElementById('arr-time' + i).value);
+        var burstTime = parseInt(document.getElementById('burst-time' + i).value);
+        var priority = parseInt(document.getElementById('priority' + i).value);
+        processes.push({ pid: pid, arrivalTime: arrivalTime, burstTime: burstTime, priority: priority });
+      }
+
+      // Priority scheduling logic
+      var count = processes.length;
+      processes.sort((a, b) => {
+        if (a.priority !== b.priority) {
+          return a.priority - b.priority;
+        } else {
+          return a.arrivalTime - b.arrivalTime;
+        }
+      });
+
+      var currentTime = 0;
+      for (var i = 0; i < count; i++) {
+        var currentProcess = processes[i];
+        if (currentProcess.arrivalTime > currentTime) {
+          currentTime = currentProcess.arrivalTime;
+        }
+        currentTime += currentProcess.burstTime;
+        currentProcess.turnaroundTime = currentTime - currentProcess.arrivalTime;
+        currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
+        totalTurnaroundTime += currentProcess.turnaroundTime;
+        totalWaitingTime += currentProcess.waitingTime;
+      }
+
+      var outputHTML = '<h3>Table</h3><table>';
+      outputHTML += '<tr><th>Process</th><th>Arrival Time</th><th>Burst Time</th><th>Priority</th><th>Turnaround Time</th><th>Waiting Time</th></tr>';
+
+      processes.forEach(process => {
+        outputHTML += '<tr>';
+        outputHTML += '<td>' + process.pid + '</td>';
+        outputHTML += '<td>' + process.arrivalTime + '</td>';
+        outputHTML += '<td>' + process.burstTime + '</td>';
+        outputHTML += '<td>' + process.priority + '</td>';
+        outputHTML += '<td>' + process.turnaroundTime + '</td>';
+        outputHTML += '<td>' + process.waitingTime + '</td>';
+        outputHTML += '</tr>';
+      });
+
+      outputHTML += '</table>';
+      outputHTML += '<p>Average Waiting Time: ' + (totalWaitingTime / count).toFixed(2) + '</p>';
+      outputHTML += '<p>Average Turnaround Time: ' + (totalTurnaroundTime / count).toFixed(2) + '</p>';
+
+      document.getElementById("output").innerHTML = outputHTML;
+    }
+
+    document.getElementById('run-scheduler').addEventListener('click', function() {
+      priorityScheduler();
+    });
+  </script>
+</body>
+</html>

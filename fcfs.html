@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FCFS Scheduling</title>
+<link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+<h2>FCFS Scheduling</h2>
+<div>
+    <label for="processes">Number of Processes:</label>
+    <input type="number" id="processes" min="1" value="1">
+    <button onclick="generateForm()">Generate Form</button>
+</div>
+<div id="formContainer"></div>
+<button onclick="scheduleFCFS()">Schedule FCFS</button>
+<div id="output"></div>
+<div class="container">
+    <a href="home.html" class="btn">HOME</a>
+</div>
+
+<script>
+    // JavaScript code
+    function generateForm() {
+        var processes = parseInt(document.getElementById("processes").value);
+        var formHTML = '';
+        for (var i = 0; i < processes; i++) {
+            formHTML += '<div>';
+            formHTML += '<label for="arrivalTime' + i + '">Arrival Time for Process ' + (i + 1) + ':</label>';
+            formHTML += '<input type="number" id="arrivalTime' + i + '" min="0" value="0">';
+            formHTML += '<label for="burstTime' + i + '">Burst Time for Process ' + (i + 1) + ':</label>';
+            formHTML += '<input type="number" id="burstTime' + i + '" min="1" value="1">';
+            formHTML += '</div>';
+        }
+        document.getElementById("formContainer").innerHTML = formHTML;
+    }
+
+    function scheduleFCFS() {
+        var processes = parseInt(document.getElementById("processes").value);
+        var processList = [];
+        for (var i = 0; i < processes; i++) {
+            var arrivalTime = parseInt(document.getElementById("arrivalTime" + i).value);
+            var burstTime = parseInt(document.getElementById("burstTime" + i).value);
+            processList.push({ p_no: i + 1, AT: arrivalTime, BT: burstTime });
+        }
+
+        processList.sort((a, b) => a.AT - b.AT);
+
+        var completionTime = 0;
+        var waitingTimeTotal = 0;
+        var turnaroundTimeTotal = 0;
+
+        var outputHTML = '<h3>Table</h3><table>';
+        outputHTML += '<tr><th>Process</th><th>Arrival Time</th><th>Burst Time</th><th>Completion Time</th><th>Waiting Time</th><th>Turnaround Time</th></tr>';
+
+        processList.forEach(process => {
+            completionTime = Math.max(completionTime, process.AT) + process.BT;
+            var turnaroundTime = completionTime - process.AT;
+            var waitingTime = turnaroundTime - process.BT;
+            waitingTimeTotal += waitingTime;
+            turnaroundTimeTotal += turnaroundTime;
+            outputHTML += '<tr>';
+            outputHTML += '<td>P' + process.p_no + '</td>';
+            outputHTML += '<td>' + process.AT + '</td>';
+            outputHTML += '<td>' + process.BT + '</td>';
+            outputHTML += '<td>' + completionTime + '</td>';
+            outputHTML += '<td>' + waitingTime + '</td>';
+            outputHTML += '<td>' + turnaroundTime + '</td>';
+            outputHTML += '</tr>';
+        });
+
+        outputHTML += '</table>';
+        outputHTML += '<p>Average Waiting Time: ' + (waitingTimeTotal / processes).toFixed(2) + '</p>';
+        outputHTML += '<p>Average Turnaround Time: ' + (turnaroundTimeTotal / processes).toFixed(2) + '</p>';
+
+        document.getElementById("output").innerHTML = outputHTML;
+    }
+</script>
+
+
+</body>
+</html>
+

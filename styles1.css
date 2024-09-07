@@ -1,0 +1,43 @@
+body {
+    font-family: 'Times New Roman', sans-serif;
+    font-size: 20px;
+    text-align: center;
+    background-color: #d3e8ff; /* Light blue background */
+}
+h2 {
+    color: #113d6c; /* Blue heading */
+}
+.container {
+    margin-top: 20px;
+}
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    background-color: #113d6c; /* Blue button */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+.btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Table styling */
+table {
+    border-collapse: collapse;
+    width: 80%;
+    margin: 0 auto; /* Center align the table */
+}
+th, td {
+    border: 1px solid #113d6c; /* Border color */
+    text-align: left;
+    background-color: #ffffff;
+    padding: 8px;
+}
+th {
+    background-color: #e4f7ff;
+}

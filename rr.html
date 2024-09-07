@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Round Robin Scheduler</title>
+  <link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+  <h2>Round Robin Scheduler</h2>
+  <form id="process-form">
+    <label for="process-count">Number of Processes:</label>
+    <input type="number" id="process-count" name="process-count" required>
+    <button type="submit">Generate Form</button>
+  </form>
+
+  <div id="process-input"> </div>
+
+  <button id="run-scheduler" >Schedule RR</button>
+
+  <div id="output"></div>
+  <div class="container">
+    <a href="home.html" class="btn">HOME</a>
+    </div>
+
+  <script>
+    document.getElementById('process-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var processCount = parseInt(document.getElementById('process-count').value);
+      var processInputDiv = document.getElementById('process-input');
+      processInputDiv.innerHTML = '';
+
+      for (var i = 0; i < processCount; i++) {
+        var div = document.createElement('div');
+        div.innerHTML = `
+          <h3>Process ${i + 1}</h3>
+          <label for="pid${i}">Process ID:</label>
+          <input type="text" id="pid${i}" name="pid${i}" required>
+          <label for="arr-time${i}">Arrival Time:</label>
+          <input type="number" id="arr-time${i}" name="arr-time${i}" required>
+          <label for="burst-time${i}">Burst Time:</label>
+          <input type="number" id="burst-time${i}" name="burst-time${i}" required>
+        `;
+        processInputDiv.appendChild(div);
+      }
+
+      document.getElementById('process-input').style.display = 'block';
+      document.getElementById('run-scheduler').style.display = 'block';
+    });
+
+    function roundRobin() {
+  var timeQuantum = parseInt(prompt("Enter the time quantum:"));
+  var processes = [];
+  var totalTurnaroundTime = 0;
+  var totalWaitingTime = 0;
+
+  for (var i = 0; i < document.getElementById('process-count').value; i++) {
+    var pid = document.getElementById('pid' + i).value;
+    var arrivalTime = parseInt(document.getElementById('arr-time' + i).value);
+    var burstTime = parseInt(document.getElementById('burst-time' + i).value);
+    processes.push({ pid: pid, arrivalTime: arrivalTime, burstTime: burstTime, remainingTime: burstTime });
+  }
+
+  var currentTime = 0;
+  var processList = [];
+  var remainingProcesses = processes.length;
+
+  while (remainingProcesses > 0) {
+    for (var i = 0; i < processes.length; i++) {
+      var currentProcess = processes[i];
+      if (currentProcess.remainingTime > 0) {
+        var executionTime = Math.min(timeQuantum, currentProcess.remainingTime);
+        currentTime += executionTime;
+        currentProcess.remainingTime -= executionTime;
+
+        if (currentProcess.remainingTime === 0) {
+          var turnaroundTime = currentTime - currentProcess.arrivalTime;
+          var waitingTime = turnaroundTime - currentProcess.burstTime;
+          totalTurnaroundTime += turnaroundTime;
+          totalWaitingTime += waitingTime;
+          processList.push({
+            p_no: currentProcess.pid,
+            AT: currentProcess.arrivalTime,
+            BT: currentProcess.burstTime,
+            CT: currentTime,
+            WT: waitingTime,
+            TAT: turnaroundTime
+          });
+          remainingProcesses--;
+        }
+      }
+    }
+  }
+
+  var outputHTML = '<h3>Table</h3><table>';
+  outputHTML += '<tr><th>Process</th><th>Arrival Time</th><th>Burst Time</th><th>Completion Time</th><th>Waiting Time</th><th>Turnaround Time</th></tr>';
+
+  processList.forEach(process => {
+    outputHTML += '<tr>';
+    outputHTML += '<td>' + process.p_no + '</td>';
+    outputHTML += '<td>' + process.AT + '</td>';
+    outputHTML += '<td>' + process.BT + '</td>';
+    outputHTML += '<td>' + process.CT + '</td>';
+    outputHTML += '<td>' + process.WT + '</td>';
+    outputHTML += '<td>' + process.TAT + '</td>';
+    outputHTML += '</tr>';
+  });
+
+  outputHTML += '</table>';
+  outputHTML += '<p>Average Waiting Time: ' + (totalWaitingTime / processList.length).toFixed(2) + '</p>';
+  outputHTML += '<p>Average Turnaround Time: ' + (totalTurnaroundTime / processList.length).toFixed(2) + '</p>';
+
+  document.getElementById("output").innerHTML = outputHTML;
+}
+
+    
+document.getElementById('run-scheduler').addEventListener('click', function() {
+      roundRobin();
+
+
+    });
+
+  </script>
+</body>
+</html>
